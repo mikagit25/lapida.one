@@ -1,0 +1,850 @@
+```jsx
+import { useState, useEffect } from 'react';
+
+const App = () => {
+  const [activeTab, setActiveTab] = useState('home');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedMemorial, setSelectedMemorial] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+
+  // Mock data for memorials
+  const mockMemorials = [
+    {
+      id: 1,
+      name: "Иван Петров",
+      birthDate: "1945-03-12",
+      deathDate: "2023-08-20",
+      description: "Любимый дедушка и отец",
+      photos: ["https://placehold.co/600x400?text=Ivan+Photo+1", "https://placehold.co/600x400?text=Ivan+Photo+2"],
+      videos: ["https://placehold.co/600x400?text=Ivan+Video+1"],
+      timeline: [
+        { year: 1945, event: "Родился в Москве" },
+        { year: 1968, event: "Закончил МГТУ им. Баумана" },
+        { year: 1975, event: "Женился на Ольге" },
+        { year: 2023, event: "Ушел из жизни" }
+      ],
+      location: "Московское кладбище, участок 5, ряд 3, место 12",
+      coordinates: { lat: 55.751244, lng: 37.618423 },
+      virtualFlowers: 25,
+      prayers: 18,
+      virtualCandles: 42,
+      QRCode: generateQRCode(1)
+    },
+    {
+      id: 2,
+      name: "Мария Смирнова",
+      birthDate: "1985-07-22",
+      deathDate: "2022-11-05",
+      description: "Талантливый художник и мать двоих детей",
+      photos: ["https://placehold.co/600x400?text=Maria+Photo+1"],
+      videos: [],
+      timeline: [
+        { year: 1985, event: "Родилась в Санкт-Петербурге" },
+        { year: 2002, event: "Начала учиться живописи" },
+        { year: 2010, event: "Выставка в Эрмитаже" },
+        { year: 2022, event: "Ушла после болезни" }
+      ],
+      location: "Санкт-Петербургское кладбище, участок 2, ряд 7, место 4",
+      coordinates: { lat: 59.939095, lng: 30.315868 },
+      virtualFlowers: 37,
+      prayers: 22,
+      virtualCandles: 55,
+      QRCode: generateQRCode(2)
+    },
+    {
+      id: 3,
+      name: "Барсик (кот)",
+      birthDate: "2010-05-15",
+      deathDate: "2021-09-01",
+      description: "Верный друг и компаньон",
+      photos: ["https://placehold.co/600x400?text=Barsik+Photo+1"],
+      videos: [],
+      timeline: [
+        { year: 2010, event: "Появление в семье" },
+        { year: 2015, event: "Первый выездной отдых с хозяевами" },
+        { year: 2021, event: "Ушел из жизни" }
+      ],
+      location: "Домашнее захоронение во дворе дома",
+      coordinates: null,
+      virtualFlowers: 15,
+      prayers: 8,
+      virtualCandles: 20,
+      QRCode: generateQRCode(3)
+    }
+  ];
+
+  // Mock data for funeral services
+  const funeralServices = [
+    {
+      id: 1,
+      name: "РитуалСервис",
+      description: "Полный комплекс ритуальных услуг",
+      location: "Москва",
+      rating: 4.7,
+      services: ["Организация похорон", "Изготовление надгробий", "Кремация", "Транспортировка тела"],
+      QRCode: generateQRCode(`service-${1}`)
+    },
+    {
+      id: 2,
+      name: "Вечная Память",
+      description: "Изготовление надгробий и памятников",
+      location: "Санкт-Петербург",
+      rating: 4.5,
+      services: ["Изготовление надгробий", "Благоустройство могил", "Гравировка"],
+      QRCode: generateQRCode(`service-${2}`)
+    },
+    {
+      id: 3,
+      name: "Покой",
+      description: "Организация похорон под ключ",
+      location: "Екатеринбург",
+      rating: 4.6,
+      services: ["Организация похорон", "Кремация", "Транспортировка тела", "Оформление документов"],
+      QRCode: generateQRCode(`service-${3}`)
+    }
+  ];
+
+  // Mock data for churches
+  const churches = [
+    {
+      id: 1,
+      name: "Храм Христа Спасителя",
+      description: "Главный православный храм России",
+      location: "Москва",
+      religion: "Православие",
+      services: ["Молебны", "Панихиды", "Заказ свечей", "Прямые трансляции богослужений"],
+      QRCode: generateQRCode(`church-${1}`)
+    },
+    {
+      id: 2,
+      name: "Казанский собор",
+      description: "Исторический православный собор в центре Санкт-Петербурга",
+      location: "Санкт-Петербург",
+      religion: "Православие",
+      services: ["Молебны", "Панихиды", "Заказ свечей"],
+      QRCode: generateQRCode(`church-${2}`)
+    }
+  ];
+
+  // Generate QR code URL
+  function generateQRCode(id) {
+    return `https://quickchart.io/qr?text=https://lapida.one/${id}&size=200`;
+  }
+
+  // Filtered memorials based on search
+  const filteredMemorials = mockMemorials.filter(memorial =>
+    memorial.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    memorial.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Custom SVG Icons
+  const icons = {
+    home: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 1 0 01-1 1h-3m-6 0a1 1 1 0 001-1v-4a1 1 1 0 011-1h2a1 1 1 0 011 1v4a1 1 1 0 001 1m-6 0h6" />
+      </svg>
+    ),
+    add: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+    ),
+    user: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+    search: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    ),
+    menu: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    ),
+    close: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    ),
+    flower: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    ),
+    candle: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    ),
+    prayer: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    ),
+    map: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+      </svg>
+    ),
+    calendar: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    )
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <span className="text-2xl font-bold text-indigo-700">lapida<span className="text-pink-500">.one</span></span>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-8">
+            <button 
+              onClick={() => setActiveTab('home')} 
+              className={`px-1 py-2 font-medium ${activeTab === 'home' ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-600 hover:text-indigo-700'}`}
+            >
+              Главная
+            </button>
+            <button 
+              onClick={() => setActiveTab('memorials')} 
+              className={`px-1 py-2 font-medium ${activeTab === 'memorials' ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-600 hover:text-indigo-700'}`}
+            >
+              Страницы памяти
+            </button>
+            <button 
+              onClick={() => setActiveTab('services')} 
+              className={`px-1 py-2 font-medium ${activeTab === 'services' ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-600 hover:text-indigo-700'}`}
+            >
+              Ритуальные услуги
+            </button>
+            <button 
+              onClick={() => setActiveTab('churches')} 
+              className={`px-1 py-2 font-medium ${activeTab === 'churches' ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-600 hover:text-indigo-700'}`}
+            >
+              Церкви
+            </button>
+            <button 
+              onClick={() => setActiveTab('articles')} 
+              className={`px-1 py-2 font-medium ${activeTab === 'articles' ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-600 hover:text-indigo-700'}`}
+            >
+              Статьи
+            </button>
+          </nav>
+
+          <div className="flex items-center space-x-4">
+            <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100">
+              {icons.user}
+            </button>
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
+            >
+              {isMenuOpen ? icons.close : icons.menu}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200">
+            <div className="px-4 py-3 space-y-1">
+              <button 
+                onClick={() => {setActiveTab('home'); setIsMenuOpen(false)}} 
+                className={`block w-full text-left px-3 py-2 rounded-md ${activeTab === 'home' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                Главная
+              </button>
+              <button 
+                onClick={() => {setActiveTab('memorials'); setIsMenuOpen(false)}} 
+                className={`block w-full text-left px-3 py-2 rounded-md ${activeTab === 'memorials' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                Страницы памяти
+              </button>
+              <button 
+                onClick={() => {setActiveTab('services'); setIsMenuOpen(false)}} 
+                className={`block w-full text-left px-3 py-2 rounded-md ${activeTab === 'services' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                Ритуальные услуги
+              </button>
+              <button 
+                onClick={() => {setActiveTab('churches'); setIsMenuOpen(false)}} 
+                className={`block w-full text-left px-3 py-2 rounded-md ${activeTab === 'churches' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                Церкви
+              </button>
+              <button 
+                onClick={() => {setActiveTab('articles'); setIsMenuOpen(false)}} 
+                className={`block w-full text-left px-3 py-2 rounded-md ${activeTab === 'articles' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                Статьи
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {/* Home Tab */}
+        {activeTab === 'home' && (
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">Виртуальное кладбище lapida.one</h1>
+              <p className="text-xl text-gray-600 mb-8">
+                Создавайте вечные страницы памяти для ваших близких и сохраняйте их историю навсегда
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button 
+                  onClick={() => setActiveTab('memorials')}
+                  className="px-8 py-3 bg-indigo-700 text-white rounded-lg hover:bg-indigo-800 transition duration-300"
+                >
+                  Посмотреть страницы памяти
+                </button>
+                <button 
+                  onClick={() => setActiveTab('services')}
+                  className="px-8 py-3 bg-white text-indigo-700 border border-indigo-700 rounded-lg hover:bg-indigo-50 transition duration-300"
+                >
+                  Ритуальные услуги
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                  {icons.flower}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Виртуальные цветы</h3>
+                <p className="text-gray-600">
+                  Оставляйте виртуальные цветы на страницах памяти как символ уважения и любви.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                  {icons.candle}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Свечи и молитвы</h3>
+                <p className="text-gray-600">
+                  Зажигайте виртуальные свечи и заказывайте молитвы за упокой души ваших близких.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                  {icons.map}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Точное местоположение</h3>
+                <p className="text-gray-600">
+                  Указывайте точные координаты захоронения для удобного посещения могилы.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-indigo-700 to-purple-600 rounded-xl overflow-hidden shadow-xl">
+              <div className="p-8 md:p-12 text-white">
+                <h2 className="text-3xl font-bold mb-4">Создайте свою страницу памяти сегодня</h2>
+                <p className="mb-6 text-indigo-100 max-w-2xl">
+                  Наша платформа позволяет создавать вечные страницы памяти для ваших близких, где вы можете делиться воспоминаниями, фотографиями и видео.
+                </p>
+                <button 
+                  onClick={() => setActiveTab('memorials')}
+                  className="px-6 py-3 bg-white text-indigo-700 rounded-lg font-medium hover:bg-indigo-50 transition duration-300"
+                >
+                  Посмотреть страницы
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Memorials Tab */}
+        {activeTab === 'memorials' && (
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+              <h2 className="text-3xl font-bold text-gray-900">Страницы памяти</h2>
+              
+              <div className="relative w-full md:w-64">
+                <input
+                  type="text"
+                  placeholder="Поиск..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <div className="absolute left-3 top-2.5 text-gray-400">
+                  {icons.search}
+                </div>
+              </div>
+            </div>
+
+            {selectedMemorial ? (
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div className="bg-gradient-to-r from-indigo-700 to-purple-600 h-48"></div>
+                
+                <div className="p-6 md:p-8">
+                  <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-8 -mt-16">
+                    <img 
+                      src={selectedMemorial.photos[0]} 
+                      alt={selectedMemorial.name}
+                      className="w-32 h-32 md:w-40 md:h-40 rounded-xl object-cover border-4 border-white shadow-lg"
+                    />
+                    
+                    <div>
+                      <h3 className="text-3xl font-bold text-gray-900">{selectedMemorial.name}</h3>
+                      <p className="text-gray-600 mt-1">
+                        {new Date(selectedMemorial.birthDate).getFullYear()} – {new Date(selectedMemorial.deathDate).getFullYear()}
+                      </p>
+                    </div>
+                    
+                    <div className="ml-auto">
+                      <button 
+                        onClick={() => {
+                          setQrCodeUrl(selectedMemorial.QRCode);
+                          setShowQRModal(true);
+                        }}
+                        className="p-2 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300"
+                      >
+                        <img 
+                          src={selectedMemorial.QRCode} 
+                          alt="QR Code"
+                          className="w-24 h-24"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <p className="text-gray-700">{selectedMemorial.description}</p>
+                  </div>
+                  
+                  <div className="mt-8">
+                    <h4 className="text-xl font-semibold text-gray-800 mb-4">Фотогалерея</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {selectedMemorial.photos.map((photo, index) => (
+                        <img 
+                          key={index}
+                          src={photo} 
+                          alt={`${selectedMemorial.name} ${index + 1}`}
+                          className="rounded-lg object-cover h-40 w-full"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {selectedMemorial.videos.length > 0 && (
+                    <div className="mt-8">
+                      <h4 className="text-xl font-semibold text-gray-800 mb-4">Видео</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {selectedMemorial.videos.map((video, index) => (
+                          <div key={index} className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
+                            <img src={video} alt="Video thumbnail" className="rounded-lg max-h-full" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="mt-8">
+                    <h4 className="text-xl font-semibold text-gray-800 mb-4">Хронология жизни</h4>
+                    <div className="relative border-l-2 border-gray-200 ml-4">
+                      {selectedMemorial.timeline.map((item, index) => (
+                        <div key={index} className="mb-6 pl-6 relative">
+                          <div className="absolute w-3 h-3 bg-indigo-700 rounded-full -left-[7px] top-2"></div>
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h5 className="font-semibold text-indigo-700">{item.year}</h5>
+                            <p className="text-gray-700">{item.event}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8">
+                    <h4 className="text-xl font-semibold text-gray-800 mb-4">Добавить воспоминание</h4>
+                    <form className="space-y-4">
+                      <textarea 
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        rows="4"
+                        placeholder="Поделитесь своим воспоминанием или эпитафией..."
+                      ></textarea>
+                      <div className="flex justify-end">
+                        <button 
+                          type="submit"
+                          className="px-4 py-2 bg-indigo-700 text-white rounded-lg hover:bg-indigo-800 transition duration-300"
+                        >
+                          Отправить
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <div className="flex flex-wrap gap-4">
+                      <button 
+                        onClick={() => {
+                          // Handle virtual flower action
+                          const updatedMemorial = {...selectedMemorial};
+                          updatedMemorial.virtualFlowers += 1;
+                          setSelectedMemorial(updatedMemorial);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-lg hover:bg-pink-200 transition duration-300"
+                      >
+                        {icons.flower}
+                        <span>Виртуальный цветок ({selectedMemorial.virtualFlowers})</span>
+                      </button>
+                      
+                      <button 
+                        onClick={() => {
+                          // Handle candle lighting
+                          const updatedMemorial = {...selectedMemorial};
+                          updatedMemorial.virtualCandles += 1;
+                          setSelectedMemorial(updatedMemorial);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition duration-300"
+                      >
+                        {icons.candle}
+                        <span>Зажечь свечу ({selectedMemorial.virtualCandles})</span>
+                      </button>
+                      
+                      <button 
+                        onClick={() => {
+                          // Handle prayer request
+                          const updatedMemorial = {...selectedMemorial};
+                          updatedMemorial.prayers += 1;
+                          setSelectedMemorial(updatedMemorial);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition duration-300"
+                      >
+                        {icons.prayer}
+                        <span>Заказать молитву ({selectedMemorial.prayers})</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {selectedMemorial.location && (
+                    <div className="mt-8 pt-6 border-t border-gray-200">
+                      <h4 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        {icons.map}
+                        Местоположение захоронения
+                      </h4>
+                      <p className="text-gray-700">{selectedMemorial.location}</p>
+                    </div>
+                  )}
+                  
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <button 
+                      onClick={() => setSelectedMemorial(null)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300"
+                    >
+                      Назад к списку
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredMemorials.map(memorial => (
+                  <div 
+                    key={memorial.id}
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 cursor-pointer"
+                    onClick={() => setSelectedMemorial(memorial)}
+                  >
+                    <img 
+                      src={memorial.photos[0]} 
+                      alt={memorial.name}
+                      className="h-48 w-full object-cover"
+                    />
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">{memorial.name}</h3>
+                      <p className="text-gray-600 mb-3">
+                        {new Date(memorial.birthDate).getFullYear()} – {new Date(memorial.deathDate).getFullYear()}
+                      </p>
+                      <p className="text-gray-700 line-clamp-3">{memorial.description}</p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <span className="px-2 py-1 bg-pink-100 text-pink-700 rounded-full text-xs">
+                          Цветы: {memorial.virtualFlowers}
+                        </span>
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">
+                          Свечи: {memorial.virtualCandles}
+                        </span>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                          Молитвы: {memorial.prayers}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-dashed border-indigo-300 flex flex-col items-center justify-center p-6 hover:border-indigo-500 transition duration-300 cursor-pointer">
+                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                    {icons.add}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Создать новую страницу</h3>
+                  <p className="text-gray-600 text-center">Создайте страницу памяти для себя или своих близких</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Services Tab */}
+        {activeTab === 'services' && (
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Ритуальные услуги</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {funeralServices.map(service => (
+                <div 
+                  key={service.id} 
+                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 cursor-pointer"
+                  onClick={() => setSelectedService(service)}
+                >
+                  <div className="h-40 bg-indigo-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
+                    <p className="text-gray-600 mb-4">{service.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
+                        {service.location}
+                      </span>
+                      <div className="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span className="ml-1 text-gray-700">{service.rating}</span>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Услуги:</h4>
+                      <ul className="space-y-1">
+                        {service.services.slice(0, 2).map((serviceItem, idx) => (
+                          <li key={idx} className="text-sm text-gray-600 truncate">
+                            • {serviceItem}
+                          </li>
+                        ))}
+                        {service.services.length > 2 && (
+                          <li className="text-sm text-indigo-600">...еще {service.services.length - 2}</li>
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-dashed border-indigo-300 flex flex-col items-center justify-center p-6 hover:border-indigo-500 transition duration-300 cursor-pointer">
+                <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                  {icons.add}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Добавить компанию</h3>
+                <p className="text-gray-600 text-center">Зарегистрируйте свою ритуальную службу на нашей платформе</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Churches Tab */}
+        {activeTab === 'churches' && (
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Церкви</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {churches.map(church => (
+                <div 
+                  key={church.id} 
+                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 cursor-pointer"
+                >
+                  <div className="h-40 bg-indigo-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{church.name}</h3>
+                    <p className="text-gray-600 mb-4">{church.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
+                        {church.religion}
+                      </span>
+                      <span className="text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                        {church.location}
+                      </span>
+                    </div>
+                    <div className="mt-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Услуги:</h4>
+                      <ul className="space-y-1">
+                        {church.services.slice(0, 2).map((serviceItem, idx) => (
+                          <li key={idx} className="text-sm text-gray-600 truncate">
+                            • {serviceItem}
+                          </li>
+                        ))}
+                        {church.services.length > 2 && (
+                          <li className="text-sm text-indigo-600">...еще {church.services.length - 2}</li>
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-dashed border-indigo-300 flex flex-col items-center justify-center p-6 hover:border-indigo-500 transition duration-300 cursor-pointer">
+                <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                  {icons.add}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Добавить церковь</h3>
+                <p className="text-gray-600 text-center">Зарегистрируйте церковь на нашей платформе</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Articles Tab */}
+        {activeTab === 'articles' && (
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Статьи о традициях и обрядах</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <img src="https://placehold.co/600x400?text=Article+1" alt="Article 1" className="h-48 w-full object-cover" />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Традиции поминовения в православии</h3>
+                  <p className="text-gray-600 mb-4">Обзор традиционных обрядов и обычаев поминовения умерших в православной традиции.</p>
+                  <button className="text-indigo-700 font-medium hover:underline">Читать далее</button>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <img src="https://placehold.co/600x400?text=Article+2" alt="Article 2" className="h-48 w-full object-cover" />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Как правильно заказывать молитвы за упокой</h3>
+                  <p className="text-gray-600 mb-4">Подробное руководство по оформлению заказа молитв и панихид в православных храмах.</p>
+                  <button className="text-indigo-700 font-medium hover:underline">Читать далее</button>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <img src="https://placehold.co/600x400?text=Article+3" alt="Article 3" className="h-48 w-full object-cover" />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Современные подходы к организации похорон</h3>
+                  <p className="text-gray-600 mb-4">Анализ современных трендов в организации похорон и ритуальных услуг.</p>
+                  <button className="text-indigo-700 font-medium hover:underline">Читать далее</button>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <img src="https://placehold.co/600x400?text=Article+4" alt="Article 4" className="h-48 w-full object-cover" />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Эко-похороны: новый взгляд на прощание</h3>
+                  <p className="text-gray-600 mb-4">Информация о новых экологичных способах захоронения и поминовения умерших.</p>
+                  <button className="text-indigo-700 font-medium hover:underline">Читать далее</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-12">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">lapida.one</h3>
+              <p className="text-gray-600">
+                Виртуальное кладбище для создания вечных страниц памяти ваших близких.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Навигация</h3>
+              <ul className="space-y-2">
+                <li><button onClick={() => setActiveTab('home')} className="text-gray-600 hover:text-indigo-700">Главная</button></li>
+                <li><button onClick={() => setActiveTab('memorials')} className="text-gray-600 hover:text-indigo-700">Страницы памяти</button></li>
+                <li><button onClick={() => setActiveTab('services')} className="text-gray-600 hover:text-indigo-700">Ритуальные услуги</button></li>
+                <li><button onClick={() => setActiveTab('churches')} className="text-gray-600 hover:text-indigo-700">Церкви</button></li>
+                <li><button onClick={() => setActiveTab('articles')} className="text-gray-600 hover:text-indigo-700">Статьи</button></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Контакты</h3>
+              <ul className="space-y-2">
+                <li className="text-gray-600">Email: info@lapida.one</li>
+                <li className="text-gray-600">Телефон: +7 (XXX) XXX-XX-XX</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Подписаться</h3>
+              <p className="text-gray-600 mb-4">Получайте обновления о новых функциях и возможностях.</p>
+              <div className="flex">
+                <input 
+                  type="email" 
+                  placeholder="Ваш email" 
+                  className="px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button className="bg-indigo-700 text-white px-4 py-2 rounded-r-lg hover:bg-indigo-800 transition duration-300">
+                  Подписаться
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-200 mt-8 pt-6 text-center text-gray-500">
+            <p>&copy; {new Date().getFullYear()} lapida.one. Все права защищены.</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* QR Code Modal */}
+      {showQRModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900">QR-код</h3>
+              <button 
+                onClick={() => setShowQRModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                {icons.close}
+              </button>
+            </div>
+            <div className="flex justify-center mb-4">
+              <img src={qrCodeUrl} alt="QR Code" className="w-64 h-64" />
+            </div>
+            <p className="text-center text-gray-600 mb-6">
+              Этот QR-код можно распечатать и разместить на надгробии или визитке
+            </p>
+            <div className="flex justify-center">
+              <button 
+                onClick={() => setShowQRModal(false)}
+                className="px-4 py-2 bg-indigo-700 text-white rounded-lg hover:bg-indigo-800 transition duration-300"
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;
+
+```
