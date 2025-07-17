@@ -1,21 +1,21 @@
 // src/pages/CompanyAccount.jsx
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "../hooks/useToast";  // Хук для уведомлений
-import { getUserFromToken } from "../utils/jwt";  // Получение данных пользователя из JWT
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '../hooks/useToast'; // Хук для уведомлений
+import { getUserFromToken } from '../utils/jwt'; // Получение данных пользователя из JWT
 
 const CompanyAccount = () => {
   const navigate = useNavigate();
-  const { showToast } = useToast();  // Хук уведомлений
+  const { showToast } = useToast(); // Хук уведомлений
 
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userData = getUserFromToken();  // Получаем данные пользователя из токена
-    if (!userData || userData.role !== "company") {
-      showToast("Вы не авторизованы или не являетесь компанией", "error");
-      navigate("/login");
+    const userData = getUserFromToken(); // Получаем данные пользователя из токена
+    if (!userData || userData.role !== 'company') {
+      showToast('Вы не авторизованы или не являетесь компанией', 'error');
+      navigate('/login');
     } else {
       setCompany(userData);
       setLoading(false);
@@ -24,7 +24,7 @@ const CompanyAccount = () => {
 
   const handleSave = () => {
     // Логика для сохранения данных компании (если необходимо)
-    showToast("Данные компании успешно обновлены!");
+    showToast('Данные компании успешно обновлены!');
   };
 
   if (loading) {

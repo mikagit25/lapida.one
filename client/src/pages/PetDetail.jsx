@@ -1,11 +1,29 @@
 // src/pages/PetDetail.jsx
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"; // Для получения параметра ID из URL
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom'; // Для получения параметра ID из URL
 
 const pets = [
-  { id: 1, name: "Собака Бобик", breed: "Овчарка", age: 5, description: "Очень умная и верная собака." },
-  { id: 2, name: "Кошка Мурка", breed: "Сиамская", age: 3, description: "Очень ласковая и игривая кошка." },
-  { id: 3, name: "Попугай Кеша", breed: "Жако", age: 2, description: "Летает и разговаривает." },
+  {
+    id: 1,
+    name: 'Собака Бобик',
+    breed: 'Овчарка',
+    age: 5,
+    description: 'Очень умная и верная собака.',
+  },
+  {
+    id: 2,
+    name: 'Кошка Мурка',
+    breed: 'Сиамская',
+    age: 3,
+    description: 'Очень ласковая и игривая кошка.',
+  },
+  {
+    id: 3,
+    name: 'Попугай Кеша',
+    breed: 'Жако',
+    age: 2,
+    description: 'Летает и разговаривает.',
+  },
   // Добавь другие животные по аналогии
 ];
 

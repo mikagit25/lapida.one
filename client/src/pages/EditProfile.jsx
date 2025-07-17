@@ -1,96 +1,58 @@
-// src/pages/EditProfile.jsx
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { getUserFromToken } from "../utils/jwt"; // Функция для получения данных из токена
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const EditProfile = () => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    photo: null,
-  });
+  const [formData, setFormData] = useState({ username: '', email: '' });
 
   useEffect(() => {
-    const currentUser = getUserFromToken();
-    if (!currentUser) {
-      setError("Пользователь не авторизован.");
-      return;
+    if (user) {
+      setFormData({ username: user.username, email: user.email });
     }
-    setUser(currentUser);
-    setFormData({
-      name: currentUser.name,
-      description: currentUser.description,
-      photo: currentUser.photo,
-    });
-  }, []);
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // Здесь можно добавить логику для сохранения изменений
-    console.log("Обновленные данные: ", formData);
-    // Переход обратно в личный кабинет
-    navigate("/user/account");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put('/api/auth/edit-profile', formData);
+      navigate('/user/account');
+    } catch (err) {
+      console.error(err);
+    }
   };
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (!user) return <div>Загрузка...</div>;
 
   return (
-    <div>
+    <div className="edit-profile">
       <h1>Редактировать профиль</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div>
-          <label>Имя</label>
+          <label>Имя пользователя:</label>
           <input
             type="text"
-            name="name"
-            value={formData.name}
+            name="username"
+            value={formData.username}
             onChange={handleChange}
-            required
           />
         </div>
-
         <div>
-          <label>Описание</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Фото */}
-        <div>
-          <label>Фото</label>
+          <label>Email:</label>
           <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setFormData({ ...formData, photo: e.target.files[0] })}
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
           />
-          {formData.photo && (
-            <img
-              src={URL.createObjectURL(formData.photo)}
-              alt="Preview"
-              width="100"
-            />
-          )}
         </div>
-
-        {/* Кнопка сохранения */}
-        <button type="button" onClick={handleSave}>
-          Сохранить изменения
-        </button>
+        <button type="submit">Сохранить</button>
+        <button onClick={logout}>Выйти</button>
       </form>
     </div>
   );

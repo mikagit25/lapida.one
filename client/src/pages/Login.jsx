@@ -1,26 +1,25 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = () => {
-  const storedUser = JSON.parse(localStorage.getItem("registered_user"));
+    const storedUser = JSON.parse(localStorage.getItem('registered_user'));
 
-  if (
-    storedUser &&
-    storedUser.email === email &&
-    storedUser.password === password
-  ) {
-    localStorage.setItem("jwt_token", "lapida_admin_token");
-    navigate("/user/account");
-  } else {
-    alert("Неверный логин или пароль");
-  }
-};
-
+    if (
+      storedUser &&
+      storedUser.email === email &&
+      storedUser.password === password
+    ) {
+      localStorage.setItem('jwt_token', 'lapida_admin_token');
+      navigate('/user/account');
+    } else {
+      alert('Неверный логин или пароль');
+    }
+  };
 
   return (
     <div>
@@ -45,4 +44,3 @@ const Login = () => {
 };
 
 export default Login;
-

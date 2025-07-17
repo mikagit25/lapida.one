@@ -1,22 +1,24 @@
 // src/pages/EditPerson.jsx
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { samplePeople } from "../data/sampleData"; // Подключаем данные
-import { useToast } from "../hooks/useToast"; // Хук для уведомлений
-import CommentSection from "../components/CommentSection"; // Импорт компонента для комментариев
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { samplePeople } from '../data/sampleData'; // Подключаем данные
+import { useToast } from '../hooks/useToast'; // Хук для уведомлений
+import CommentSection from '../components/CommentSection'; // Импорт компонента для комментариев
 
 const EditPerson = () => {
   const { id } = useParams(); // Получаем ID человека
   const navigate = useNavigate();
   const [person, setPerson] = useState(null);
-  const [error, setError] = useState("");  // Для ошибок
-  const [previewImage, setPreviewImage] = useState(null);  // Для предпросмотра изображения
+  const [error, setError] = useState(''); // Для ошибок
+  const [previewImage, setPreviewImage] = useState(null); // Для предпросмотра изображения
   const { showToast } = useToast(); // Хук уведомлений
 
   useEffect(() => {
-    const foundPerson = samplePeople.find((person) => person.id === parseInt(id));
+    const foundPerson = samplePeople.find(
+      (person) => person.id === parseInt(id),
+    );
     if (!foundPerson) {
-      setError("Человек не найден.");
+      setError('Человек не найден.');
     }
     setPerson(foundPerson);
   }, [id]);
@@ -37,15 +39,15 @@ const EditPerson = () => {
 
   const handleSave = () => {
     if (!person.name || !person.description) {
-      setError("Все поля обязательны для заполнения.");
+      setError('Все поля обязательны для заполнения.');
       return;
     }
 
     // Имитация сохранения данных
-    console.log("Обновленные данные: ", person);
+    console.log('Обновленные данные: ', person);
 
     // Показать уведомление об успешном сохранении
-    showToast("Страница успешно обновлена!");
+    showToast('Страница успешно обновлена!');
 
     navigate(`/person/${person.id}`);
   };
@@ -93,9 +95,9 @@ const EditPerson = () => {
           Сохранить изменения
         </button>
       </form>
-
       {/* Вставляем секцию комментариев */}
-      <CommentSection personId={id} /> {/* Передаем ID человека для комментариев */}
+      <CommentSection personId={id} />{' '}
+      {/* Передаем ID человека для комментариев */}
     </div>
   );
 };

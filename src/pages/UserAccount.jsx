@@ -1,26 +1,23 @@
-import React from "react";
-import { getUserFromToken } from "../utils/jwt";
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const UserAccount = () => {
-  const user = getUserFromToken();
-
-  if (!user) {
-    return <div>Пользователь не авторизован</div>;
-  }
+  const { user, logout } = useAuth();
 
   return (
-    <div>
-      <h1>Добро пожаловать, {user.name}</h1>
-      <p>Email: {user.email}</p>
-      <p>Роль: {user.role}</p>
-      <button
-        onClick={() => {
-          localStorage.removeItem("jwt_token");
-          window.location.href = "/";
-        }}
-      >
-        Выйти
-      </button>
+    <div className="user-account">
+      <h1>Личный кабинет</h1>
+      {user ? (
+        <div>
+          <p>Имя пользователя: {user.username}</p>
+          <p>Email: {user.email}</p>
+          <button onClick={logout}>Выйти</button>
+          <Link to="/edit-profile">Редактировать профиль</Link>
+        </div>
+      ) : (
+        <p>Вы не авторизованы. <Link to="/login">Войти</Link></p>
+      )}
     </div>
   );
 };

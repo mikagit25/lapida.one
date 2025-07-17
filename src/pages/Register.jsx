@@ -1,52 +1,63 @@
-// src/pages/Register.jsx
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Register = () => {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    email: '',
+  });
 
-  const handleRegister = () => {
-    if (!email || !name || !password) {
-      alert("Пожалуйста, заполните все поля");
-      return;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/api/auth/register', formData);
+      navigate('/login');
+    } catch (err) {
+      console.error(err);
     }
-
-    // Храним данные в localStorage (в реальности тут будет сервер)
-    const userData = { email, name, password };
-    localStorage.setItem("registered_user", JSON.stringify(userData));
-
-    alert("Регистрация прошла успешно! Теперь войдите в систему.");
-    navigate("/login");
   };
 
   return (
     <div>
-      <h2>Регистрация</h2>
-      <input
-        type="text"
-        placeholder="Имя"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <br />
-      <input
-        type="email"
-        placeholder="Эл. почта"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <br />
-      <input
-        type="password"
-        placeholder="Пароль"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br />
-      <button onClick={handleRegister}>Зарегистрироваться</button>
+      <h1>Регистрация</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Имя пользователя:</label>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Пароль:</label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit">Зарегистрироваться</button>
+      </form>
     </div>
   );
 };

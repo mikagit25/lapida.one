@@ -1,13 +1,14 @@
 // src/components/CommentSection.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 const CommentSection = ({ personId }) => {
   const [comments, setComments] = useState([]); // Храним комментарии
-  const [newComment, setNewComment] = useState(""); // Текст нового комментария
+  const [newComment, setNewComment] = useState(''); // Текст нового комментария
 
   useEffect(() => {
     // Имитируем загрузку комментариев для человека
-    const savedComments = JSON.parse(localStorage.getItem(`comments_${personId}`)) || [];
+    const savedComments =
+      JSON.parse(localStorage.getItem(`comments_${personId}`)) || [];
     setComments(savedComments);
   }, [personId]);
 
@@ -19,8 +20,11 @@ const CommentSection = ({ personId }) => {
     if (newComment.trim()) {
       const updatedComments = [...comments, newComment];
       setComments(updatedComments);
-      localStorage.setItem(`comments_${personId}`, JSON.stringify(updatedComments)); // Сохраняем комментарии в localStorage
-      setNewComment(""); // Очищаем поле ввода
+      localStorage.setItem(
+        `comments_${personId}`,
+        JSON.stringify(updatedComments),
+      ); // Сохраняем комментарии в localStorage
+      setNewComment(''); // Очищаем поле ввода
     }
   };
 

@@ -1,15 +1,16 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem("jwt_token");
+  const { user } = useAuth();
 
-  // Если токен отсутствует — перенаправляем на /login
-  if (!token) {
+  // Если пользователь не авторизован — перенаправляем на /login
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Если токен есть — показываем дочерний компонент
+  // Если пользователь авторизован — показываем дочерний компонент
   return children;
 };
 

@@ -1,25 +1,15 @@
-import React from "react";
-import { getUserFromToken } from "../utils/jwt";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const UserAccount = () => {
-  const user = getUserFromToken();
-
-  if (!user) {
-    return <div>Пользователь не авторизован</div>;
-  }
+  const navigate = useNavigate();
 
   return (
     <div>
-      <h1>Добро пожаловать, {user.name}</h1>
-      <p>Email: {user.email}</p>
-      <p>Роль: {user.role}</p>
-      <button
-        onClick={() => {
-          localStorage.removeItem("jwt_token");
-          window.location.href = "/";
-        }}
-      >
-        Выйти
+      <h1>Личный кабинет</h1>
+      <p>Здесь вы можете редактировать свой профиль.</p>
+      <button onClick={() => navigate('/edit-profile')}>
+        Редактировать профиль
       </button>
     </div>
   );

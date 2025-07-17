@@ -1,22 +1,22 @@
 // src/pages/EditProfile.jsx
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { getUserFromToken } from "../utils/jwt"; // Функция для получения данных из токена
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getUserFromToken } from '../utils/jwt'; // Функция для получения данных из токена
 
 const EditProfile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
     photo: null,
   });
 
   useEffect(() => {
     const currentUser = getUserFromToken();
     if (!currentUser) {
-      setError("Пользователь не авторизован.");
+      setError('Пользователь не авторизован.');
       return;
     }
     setUser(currentUser);
@@ -34,9 +34,9 @@ const EditProfile = () => {
 
   const handleSave = () => {
     // Здесь можно добавить логику для сохранения изменений
-    console.log("Обновленные данные: ", formData);
+    console.log('Обновленные данные: ', formData);
     // Переход обратно в личный кабинет
-    navigate("/user/account");
+    navigate('/user/account');
   };
 
   if (error) {
@@ -76,7 +76,9 @@ const EditProfile = () => {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setFormData({ ...formData, photo: e.target.files[0] })}
+            onChange={(e) =>
+              setFormData({ ...formData, photo: e.target.files[0] })
+            }
           />
           {formData.photo && (
             <img

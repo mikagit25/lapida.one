@@ -1,32 +1,33 @@
 // src/pages/MemorialDetail.jsx
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import QRCode from '../components/QRCode.jsx';
 
 // Пример данных для подробного отображения памятников
 const sampleMemorials = [
   {
     id: 1,
-    name: "Иван Иванов",
+    name: 'Иван Иванов',
     description:
-      "Память о великом человеке, который оставил след в сердцах. Он был примером мужества и доброты.",
-    photo: "https://via.placeholder.com/150",
+      'Память о великом человеке, который оставил след в сердцах. Он был примером мужества и доброты.',
+    photo: 'https://via.placeholder.com/150',
     flowers: 12,
     candles: 5,
     comments: [
-      { id: 1, text: "Ты всегда будешь в наших сердцах!" },
-      { id: 2, text: "Светлая память." },
+      { id: 1, text: 'Ты всегда будешь в наших сердцах!' },
+      { id: 2, text: 'Светлая память.' },
     ],
   },
   {
     id: 2,
-    name: "Мария Петрова",
-    description: "Любящая мать и жена, всегда в наших сердцах.",
-    photo: "https://via.placeholder.com/150",
+    name: 'Мария Петрова',
+    description: 'Любящая мать и жена, всегда в наших сердцах.',
+    photo: 'https://via.placeholder.com/150',
     flowers: 7,
     candles: 2,
     comments: [
-      { id: 1, text: "Ты была добрым и светлым человеком." },
-      { id: 2, text: "Вечно в нашей памяти." },
+      { id: 1, text: 'Ты была добрым и светлым человеком.' },
+      { id: 2, text: 'Вечно в нашей памяти.' },
     ],
   },
 ];
@@ -39,12 +40,12 @@ const MemorialDetail = () => {
   useEffect(() => {
     // Ищем памятник по ID
     const foundMemorial = sampleMemorials.find(
-      (memorial) => memorial.id === parseInt(id)
+      (memorial) => memorial.id === parseInt(id),
     );
     if (foundMemorial) {
       setMemorial(foundMemorial);
     } else {
-      navigate("/memorials"); // Если не нашли памятник, перенаправляем на список
+      navigate('/memorials'); // Если не нашли памятник, перенаправляем на список
     }
   }, [id, navigate]);
 
@@ -54,7 +55,7 @@ const MemorialDetail = () => {
       ...prev,
       comments: [
         ...prev.comments,
-        { id: prev.comments.length + 1, text: "Новый комментарий" },
+        { id: prev.comments.length + 1, text: 'Новый комментарий' },
       ],
     }));
   };
@@ -82,8 +83,12 @@ const MemorialDetail = () => {
       <h1>{memorial.name}</h1>
       <img src={memorial.photo} alt={memorial.name} width={150} />
       <p>{memorial.description}</p>
-      <button onClick={handleAddFlower}>Поставить цветок ({memorial.flowers})</button>
-      <button onClick={handleAddCandle}>Зажечь свечу ({memorial.candles})</button>
+      <button onClick={handleAddFlower}>
+        Поставить цветок ({memorial.flowers})
+      </button>
+      <button onClick={handleAddCandle}>
+        Зажечь свечу ({memorial.candles})
+      </button>
       <h3>Комментарии</h3>
       <div>
         {memorial.comments.map((comment) => (
@@ -91,7 +96,7 @@ const MemorialDetail = () => {
         ))}
       </div>
       <button onClick={handleAddComment}>Добавить комментарий</button>
-      <button onClick={() => navigate("/memorials")}>Назад</button>
+      <button onClick={() => navigate('/memorials')}>Назад</button>
     </div>
   );
 };

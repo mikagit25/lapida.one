@@ -1,21 +1,21 @@
 // src/pages/People.jsx
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 // Пример данных для людей
 const samplePeople = [
   {
     id: 1,
-    name: "Иван Иванов",
-    description: "Память о великом человеке.",
-    photo: "https://via.placeholder.com/150",
+    name: 'Иван Иванов',
+    description: 'Память о великом человеке.',
+    photo: 'https://via.placeholder.com/150',
     creatorId: 1, // ID создателя
   },
   {
     id: 2,
-    name: "Мария Петрова",
-    description: "Любящая мать и жена.",
-    photo: "https://via.placeholder.com/150",
+    name: 'Мария Петрова',
+    description: 'Любящая мать и жена.',
+    photo: 'https://via.placeholder.com/150',
     creatorId: 2, // ID создателя
   },
 ];
