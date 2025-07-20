@@ -1,11 +1,38 @@
-{
-  "extends": ["eslint:recommended", "plugin:node/recommended", "prettier"],
-  "plugins": ["prettier"],
-  "rules": {
-    "prettier/prettier": "error",
-    "no-unused-vars": "warn"
+module.exports = {
+  env: {
+    browser: true,
+    node: true,
+    es2021: true,
   },
-  "env": {
-    "node": true
-  }
-}
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+  ],
+  parserOptions: {
+    ecmaFeatures: { jsx: true },
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
+  plugins: ['react', 'react-refresh'],
+  rules: {
+    // Общие правила
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'no-undef': 'error',
+    'react-refresh/only-export-components': 'warn',
+
+    // Для читаемости
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
+
+    // Примеры пользовательских настроек
+    'semi': ['error', 'always'],
+    'quotes': ['error', 'single'],
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
+};
