@@ -1,6 +1,5 @@
-// src/context/AuthContext.jsx
-
 import { createContext, useContext, useState, useEffect } from 'react';
+import { loginUser } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -9,7 +8,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Имитация проверки сессии
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -19,20 +17,11 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     try {
-      // TODO: заменить fetch на реальный API
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) throw new Error('Ошибка входа');
-
-      const data = await response.json();
+      const data = await loginUser(credentials);
       setUser(data.user);
       localStorage.setItem('user', JSON.stringify(data.user));
     } catch (error) {
-      console.error('Ошибка авторизации:', error);
+      console.error('Ошибка входа:', error);
     }
   };
 
@@ -42,9 +31,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>{children}</AuthContext.Provider>
   );
 }
 

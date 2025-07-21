@@ -31,12 +31,7 @@ const Register = () => {
       <form onSubmit={handleSubmit}>
         <div>
           <label>Имя пользователя:</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
+          <input type="text" name="username" value={formData.username} onChange={handleChange} />
         </div>
         <div>
           <label>Пароль:</label>
@@ -49,12 +44,7 @@ const Register = () => {
         </div>
         <div>
           <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
+          <input type="email" name="email" value={formData.email} onChange={handleChange} />
         </div>
         <button type="submit">Зарегистрироваться</button>
       </form>

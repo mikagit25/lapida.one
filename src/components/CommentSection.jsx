@@ -7,8 +7,7 @@ const CommentSection = ({ personId }) => {
 
   useEffect(() => {
     // Имитируем загрузку комментариев для человека
-    const savedComments =
-      JSON.parse(localStorage.getItem(`comments_${personId}`)) || [];
+    const savedComments = JSON.parse(localStorage.getItem(`comments_${personId}`)) || [];
     setComments(savedComments);
   }, [personId]);
 
@@ -20,10 +19,7 @@ const CommentSection = ({ personId }) => {
     if (newComment.trim()) {
       const updatedComments = [...comments, newComment];
       setComments(updatedComments);
-      localStorage.setItem(
-        `comments_${personId}`,
-        JSON.stringify(updatedComments),
-      ); // Сохраняем комментарии в localStorage
+      localStorage.setItem(`comments_${personId}`, JSON.stringify(updatedComments)); // Сохраняем комментарии в localStorage
       setNewComment(''); // Очищаем поле ввода
     }
   };

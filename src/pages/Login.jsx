@@ -30,12 +30,7 @@ const Login = () => {
       <form className="login-form" onSubmit={handleSubmit}>
         <div>
           <label>Имя пользователя:</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
+          <input type="text" name="username" value={formData.username} onChange={handleChange} />
         </div>
         <div>
           <label>Пароль:</label>

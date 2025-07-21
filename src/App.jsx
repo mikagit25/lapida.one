@@ -8,6 +8,7 @@ import EditProfile from './pages/EditProfile';
 import Memorials from './pages/Memorials';
 import MemorialDetail from './pages/MemorialDetail';
 import PrivateRoute from './components/PrivateRoute';
+import profileRoutes from './routes/profile.js';
 
 const App = () => {
   return (
@@ -43,10 +44,15 @@ const App = () => {
         />
 
         {/* 404 страница */}
-        <Route path="*" element={<div style={{ padding: '2rem' }}>404 — Страница не найдена</div>} />
+        <Route
+          path="*"
+          element={<div style={{ padding: '2rem' }}>404 — Страница не найдена</div>}
+        />
       </Routes>
     </Router>
   );
 };
+
+app.use('/api/profile', profileRoutes);
 
 export default App;

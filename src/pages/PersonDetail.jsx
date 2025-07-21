@@ -13,9 +13,7 @@ const EditPerson = () => {
   const { showToast } = useToast(); // Хук уведомлений
 
   useEffect(() => {
-    const foundPerson = samplePeople.find(
-      (person) => person.id === parseInt(id),
-    );
+    const foundPerson = samplePeople.find((person) => person.id === parseInt(id));
     if (!foundPerson) {
       setError('Человек не найден.');
     }
@@ -63,13 +61,7 @@ const EditPerson = () => {
       <form>
         <div>
           <label>Имя</label>
-          <input
-            type="text"
-            name="name"
-            value={person.name}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="name" value={person.name} onChange={handleChange} required />
         </div>
 
         <div>

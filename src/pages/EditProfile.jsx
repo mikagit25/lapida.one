@@ -51,13 +51,7 @@ const EditProfile = () => {
       <form>
         <div>
           <label>Имя</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
         </div>
 
         <div>
@@ -76,16 +70,10 @@ const EditProfile = () => {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) =>
-              setFormData({ ...formData, photo: e.target.files[0] })
-            }
+            onChange={(e) => setFormData({ ...formData, photo: e.target.files[0] })}
           />
           {formData.photo && (
-            <img
-              src={URL.createObjectURL(formData.photo)}
-              alt="Preview"
-              width="100"
-            />
+            <img src={URL.createObjectURL(formData.photo)} alt="Preview" width="100" />
           )}
         </div>
 

@@ -16,7 +16,9 @@ const UserAccount = () => {
           <Link to="/edit-profile">Редактировать профиль</Link>
         </div>
       ) : (
-        <p>Вы не авторизованы. <Link to="/login">Войти</Link></p>
+        <p>
+          Вы не авторизованы. <Link to="/login">Войти</Link>
+        </p>
       )}
     </div>
   );

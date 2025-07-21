@@ -22,29 +22,15 @@ const AddPerson = () => {
       <form onSubmit={handleSubmit}>
         <div>
           <label>Имя:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <div>
           <label>Описание:</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
         </div>
         <div>
           <label>Фото (URL):</label>
-          <input
-            type="text"
-            value={photo}
-            onChange={(e) => setPhoto(e.target.value)}
-            required
-          />
+          <input type="text" value={photo} onChange={(e) => setPhoto(e.target.value)} required />
         </div>
         <button type="submit">Добавить</button>
       </form>

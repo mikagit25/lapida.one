@@ -1,6 +1,5 @@
-// src/context/UserContext.jsx
-
 import { createContext, useContext, useState, useEffect } from 'react';
+import { updateUserProfile } from '../services/authService';
 
 const UserContext = createContext();
 
@@ -18,16 +17,7 @@ export function UserProvider({ children }) {
 
   const updateProfile = async (newData) => {
     try {
-      // TODO: заменить fetch на реальный API
-      const response = await fetch('/api/profile/update', {
-        method: 'POST',
-        body: JSON.stringify(newData),
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) throw new Error('Ошибка обновления');
-
-      const updated = await response.json();
+      const updated = await updateUserProfile(newData);
       setProfile(updated);
       localStorage.setItem('profile', JSON.stringify(updated));
     } catch (err) {
