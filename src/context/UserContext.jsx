@@ -1,23 +1,47 @@
-import React, { createContext, useContext, useState } from 'react';
+// src/context/UserContext.jsx
 
-const AuthContext = createContext(null);
+import { createContext, useContext, useState, useEffect } from 'react';
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+const UserContext = createContext();
 
-  const login = (userData) => {
-    setUser(userData);
-  };
+export function UserProvider({ children }) {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const logout = () => {
-    setUser(null);
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('profile');
+    if (savedProfile) {
+      setProfile(JSON.parse(savedProfile));
+    }
+    setLoading(false);
+  }, []);
+
+  const updateProfile = async (newData) => {
+    try {
+      // TODO: заменить fetch на реальный API
+      const response = await fetch('/api/profile/update', {
+        method: 'POST',
+        body: JSON.stringify(newData),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) throw new Error('Ошибка обновления');
+
+      const updated = await response.json();
+      setProfile(updated);
+      localStorage.setItem('profile', JSON.stringify(updated));
+    } catch (err) {
+      console.error('Ошибка обновления профиля:', err);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ profile, updateProfile, loading }}>
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
+export function useUser() {
+  return useContext(UserContext);
+}
