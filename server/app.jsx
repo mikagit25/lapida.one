@@ -5,12 +5,16 @@ import dotenv from 'dotenv';
 import authRoutes from './routers/auth.js';
 import deceasedRoutes from './routers/deceased.js';
 import QRCode from 'qrcode';
+import connectDB from './config/db.js';
 
 // Загрузка переменных окружения
 dotenv.config();
+connectDB();
 
 // Создание приложения Express
 const app = express();
+app.use(cors());
+app.use(express.json());
 
 // Подключение к MongoDB
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/lapida';
