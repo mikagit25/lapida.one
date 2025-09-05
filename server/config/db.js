@@ -1,14 +1,11 @@
-// server/config/db.js
+
 
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-    console.log('✅ MongoDB подключена');
+    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/lapida-one');
+    console.log(`✅ MongoDB подключена: ${conn.connection.host}`);
   } catch (error) {
     console.error('❌ Ошибка подключения к MongoDB:', error.message);
     process.exit(1);

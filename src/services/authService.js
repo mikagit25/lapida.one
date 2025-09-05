@@ -1,34 +1,19 @@
-// src/services/authService.js
+import axios from '../utils/axios';
 
+// Авторизация пользователя
 export async function loginUser(credentials) {
-  const response = await fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials),
-  });
-
-  if (!response.ok) throw new Error('Ошибка авторизации');
-  return await response.json();
+  const { data } = await axios.post('/api/auth/login', credentials);
+  return data;
 }
 
+// Регистрация пользователя
 export async function registerUser(data) {
-  const response = await fetch('/api/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) throw new Error('Ошибка регистрации');
-  return await response.json();
+  const res = await axios.post('/api/auth/register', data);
+  return res.data;
 }
 
+// Обновление профиля пользователя
 export async function updateUserProfile(data) {
-  const response = await fetch('/api/profile/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) throw new Error('Ошибка обновления профиля');
-  return await response.json();
+  const res = await axios.put('/api/auth/profile', data);
+  return res.data;
 }

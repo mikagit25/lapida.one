@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { updateUserProfile } from '../services/authService';
-
-const UserContext = createContext();
+import UserContext from './userContextInstance';
 
 export function UserProvider({ children }) {
   const [profile, setProfile] = useState(null);

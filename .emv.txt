@@ -1,1 +1,0 @@
-MONGO_URI=mongodb+srv://33mikalai:mm1231230@cluster0.abc.mongodb.net/lapida?retryWrites=true&w=majority

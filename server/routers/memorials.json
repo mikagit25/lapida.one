@@ -1,0 +1,46 @@
+import express from 'express';
+import authMiddleware from '../middleware/authMiddleware.js';
+import Memorial from '../models/Memorial.js';
+
+const router = express.Router();
+
+// 📦 Создание мемориала
+router.post('/', authMiddleware, async (req, res) => {
+  try {
+    const memorial = await Memorial.create({
+      ...req.body,
+      createdBy: req.user.id
+    });
+    res.status(201).json(memorial);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка создания мемориала', error: err.message });
+  }
+});
+
+// 📄 Получение всех публичных мемориалов
+router.get('/', async (req, res) => {
+  try {
+    const memorials = await Memorial.find({ privacy: 'public' }).sort({ createdAt: -1 });
+    res.json(memorials);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка получения мемориалов', error: err.message });
+  }
+});
+
+// 🔍 Получение одного мемориала
+router.get('/:id', async (req, res) => {
+  try {
+    const memorial = await Memorial.findById(req.params.id);
+    if (!memorial) return res.status(404).json({ message: 'Мемориал не найден' });
+
+    if (memorial.privacy === 'private') {
+      return res.status(403).json({ message: 'Мемориал приватный' });
+    }
+
+    res.json(memorial);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка получения мемориала', error: err.message });
+  }
+});
+
+export default router;

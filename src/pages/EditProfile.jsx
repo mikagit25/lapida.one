@@ -1,11 +1,11 @@
 // src/pages/EditProfile.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserFromToken } from '../utils/jwt'; // Функция для получения данных из токена
+import { useAuth } from '../models/AuthContext.jsx';
 
 const EditProfile = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -14,18 +14,16 @@ const EditProfile = () => {
   });
 
   useEffect(() => {
-    const currentUser = getUserFromToken();
-    if (!currentUser) {
+    if (!user) {
       setError('Пользователь не авторизован.');
       return;
     }
-    setUser(currentUser);
     setFormData({
-      name: currentUser.name,
-      description: currentUser.description,
-      photo: currentUser.photo,
+      name: user.name,
+      description: user.description,
+      photo: user.photo,
     });
-  }, []);
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

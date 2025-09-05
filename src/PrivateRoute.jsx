@@ -1,16 +1,16 @@
 // src/components/PrivateRoute.jsx
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { getUserFromToken } from '../utils/jwt'; // Импортируем функцию проверки токена
+import { useAuth } from './models/AuthContext.jsx';
 
-const PrivateRoute = ({ element }) => {
-  const user = getUserFromToken();
-
-  if (!user) {
-    return <Navigate to="/login" />; // Если нет токена, перенаправляем на страницу входа
+const PrivateRoute = ({ children }) => {
+  const { user, token } = useAuth();
+  // Строгая проверка: user должен быть объектом, иметь username или email, и токен не пустой
+  const isAuthenticated = user && (user.username || user.email) && token;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
-
-  return element; // Если есть токен, отрисовываем компонент
+  return children;
 };
 
 export default PrivateRoute;
